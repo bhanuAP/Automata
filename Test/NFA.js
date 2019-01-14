@@ -1,71 +1,19 @@
-const chai = require('chai');
-const assert = chai.assert;
 const NFA = require('../NFA/NFA');
+const Assert = require('./Assertions');
+const TestData = require('./nfaTestData.json');
 
 describe("NFA", function() {
-  it("should return true for alternate characters beginning and ending with same letter", function() {
-    let tuple = {
-      states: "states":[
-        "q1",
-        "q3",
-        "q7",
-        "q2",
-        "q5",
-        "q6",
-        "q4"
-      ],
-      alphabets: ['1', '0'],
-      delta: {
-        "q1":{
-          "e":[
-            "q2",
-            "q5"
-          ]
-        },
-        "q2":{
-          "0":[
-            "q3"
-          ]
-        },
-        "q3":{
-          "1":[
-            "q4"
-          ]
-        },
-        "q4":{
-          "0":[
-            "q3"
-          ]
-        },
-        "q5":{
-          "1":[
-            "q6"
-          ]
-        },
-        "q6":{
-          "0":[
-            "q7"
-          ]
-        },
-        "q7":{
-          "1":[
-            "q6"
-          ]
-        }
-      },
-      'start-state': 'q1',
-      'final-states': [
-        "q3",
-        "q6"
-      ]
-    };
+  let assertions;
 
-    const machine = new NFA(tuple);
-    assert.isOk(machine.doesAccept('0'));
-    assert.isOk(machine.doesAccept('010'));
-    assert.isOk(machine.doesAccept('01010'));
-    assert.isOk(machine.doesAccept('1'));
-    assert.isOk(machine.doesAccept('101'));
-    assert.isOk(machine.doesAccept('10101'));
+  beforeEach("Asserts", () => {
+    assertions = new Assert();
+  });
+
+  it("should run all test cases of NFA", function() {
+    for(let index = 0; index < TestData.length; index++) {
+      const machine = new NFA(TestData[index]['tuple']);
+      assertions.assertPassCases(machine, TestData[index]['pass-cases']);
+      assertions.assertFailCases(machine, TestData[index]['fail-cases']);
+    }
   });
 });
