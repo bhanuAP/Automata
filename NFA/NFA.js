@@ -23,17 +23,28 @@ class NFA {
       return currentStates;
     }
     currentStates = currentStates.concat(
-      this.getRelativeEpsilonState(currentStates[index]));
+      this.getRelativeEpsilonState(currentStates, currentStates[index]));
     return this.getEpsilonAppliedStates(currentStates, ++index);
   }
 
-  getRelativeEpsilonState(state, resultantStates = []) {
+  getRelativeEpsilonState(currentStates, state, resultantStates=[]) {
     if(this.delta[state] == undefined || !this.delta[state]["e"]) {
       return resultantStates;
     }
     let newState = this.delta[state]["e"];
+    if(this.allElementsIncluded(currentStates, newState)) {
+      return resultantStates;
+    }
+    newState.forEach(element => {
+     if(!currentStates.includes(element))
+     resultantStates.push(element);
+    });
     resultantStates = resultantStates.concat(newState);
-    return this.getRelativeEpsilonState(newState, resultantStates);
+    return this.getRelativeEpsilonState(currentStates,newState,resultantStates);
+  }
+
+  allElementsIncluded(currentStates, newState) {
+    return newState.every(element => currentStates.includes(element));
   }
 
   getNextStates(alphabet) {
