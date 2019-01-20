@@ -1,50 +1,22 @@
 class NFA {
-  constructor(tuple) {
+  constructor(tuple, epsilonFinder) {
     this.states = tuple.states;
     this.alphabets = tuple.alphabets;
     this.delta = tuple.delta;
     this.startingState = tuple['start-state'];
     this.acceptableStates = tuple['final-states'];
+    this.epsilonFinder = epsilonFinder;
   }
 
   doesAccept(alphabets) {
     let acceptableStates = this.acceptableStates;
     this.currentStates = [this.startingState];
-    this.currentStates = this.getEpsilonAppliedStates();
+    this.currentStates = this.epsilonFinder.getEpsilonAppliedStates(this.currentStates);
     alphabets.split("").forEach(alphabet => {
       this.currentStates = this.getNextStates(alphabet);
     });
-    this.currentStates = this.getEpsilonAppliedStates();
+    this.currentStates = this.epsilonFinder.getEpsilonAppliedStates(this.currentStates);
     return this.currentStates.some(state => acceptableStates.includes(state));
-  }
-
-  getEpsilonAppliedStates(currentStates = this.currentStates, index = 0) {
-    if(currentStates.length == index) {
-      return currentStates;
-    }
-    currentStates = currentStates.concat(
-      this.getRelativeEpsilonState(currentStates, currentStates[index]));
-    return this.getEpsilonAppliedStates(currentStates, ++index);
-  }
-
-  getRelativeEpsilonState(currentStates, state, resultantStates=[]) {
-    if(this.delta[state] == undefined || !this.delta[state]["e"]) {
-      return resultantStates;
-    }
-    let newState = this.delta[state]["e"];
-    if(this.allElementsIncluded(currentStates, newState)) {
-      return resultantStates;
-    }
-    newState.forEach(element => {
-     if(!currentStates.includes(element))
-     resultantStates.push(element);
-    });
-    resultantStates = resultantStates.concat(newState);
-    return this.getRelativeEpsilonState(currentStates,newState,resultantStates);
-  }
-
-  allElementsIncluded(currentStates, newState) {
-    return newState.every(element => currentStates.includes(element));
   }
 
   getNextStates(alphabet) {
@@ -56,7 +28,7 @@ class NFA {
         newCurrentStates = newCurrentStates.concat(this.delta[state][alphabet]);
       }
     });
-    newCurrentStates = this.getEpsilonAppliedStates(newCurrentStates);
+    newCurrentStates = this.epsilonFinder.getEpsilonAppliedStates(newCurrentStates);
     return newCurrentStates;
   }
 }
