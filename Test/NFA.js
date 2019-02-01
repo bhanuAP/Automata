@@ -1,7 +1,7 @@
 const NFA = require('../NFA/NFA');
 const Assert = require('./Assertions');
 const TestData = require('./nfaTestData.json');
-const EpsilonFinder = require('../NFA/EpsilonFinder');
+const EpsilonFinder = require('../NFA/EpsilonHandler');
 
 describe("NFA", function() {
   let assertions;

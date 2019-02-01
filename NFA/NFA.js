@@ -6,29 +6,38 @@ class NFA {
     this.epsilonHandler = epsilonHandler;
   }
 
-  doesAccept(word) {
-    let acceptableStates = this.acceptableStates;
-    this.currentStates = [this.startingState];
-    this.currentStates = this.epsilonHandler.findEpsilonStates(this.currentStates);
-    word.split("").forEach(alphabet => {
-      this.currentStates = this.getNextStates(alphabet);
+  setUpMachine() {
+    this.currentStates = this.getEpsilonStates([this.startingState]);
+  }
+
+  updateCurrentStates(alphabet) {
+    this.currentStates = this.getCurrentStates(alphabet);
+  }
+
+  getEpsilonStates(states) {
+    return this.epsilonHandler.findEpsilonStates(states);
+  }
+
+  getNextStates(state, alphabet) {
+    let hasNextStates = this.delta[state] && this.delta[state][alphabet];
+    return hasNextStates ? this.delta[state][alphabet] : "";
+  }
+
+  getCurrentStates(alphabet, states = []) {
+    this.currentStates.map(state => {
+      states = states.concat(this.getNextStates(state, alphabet));
     });
-    this.currentStates = this.epsilonHandler.findEpsilonStates(this.currentStates);
+    return this.getEpsilonStates(states);
+  }
+
+  doesAccept(alphabets) {
+    let alphabetsArray = alphabets.split("");
+    let acceptableStates = this.acceptableStates;
+    this.setUpMachine();
+    alphabetsArray.map(alphabet=>this.updateCurrentStates(alphabet));
     return this.currentStates.some(state => acceptableStates.includes(state));
   }
 
-  getNextStates(alphabet) {
-    let newCurrentStates = [];
-    this.currentStates.forEach(state => {
-      if(alphabet == "") {
-        newCurrentStates.push(state);
-      } else if(this.delta[state] != undefined && this.delta[state][alphabet]) {
-        newCurrentStates = newCurrentStates.concat(this.delta[state][alphabet]);
-      }
-    });
-    newCurrentStates = this.epsilonHandler.findEpsilonStates(newCurrentStates);
-    return newCurrentStates;
-  }
 }
 
 module.exports = NFA;
