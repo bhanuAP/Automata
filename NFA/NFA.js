@@ -1,7 +1,5 @@
 class NFA {
   constructor(tuple, epsilonFinder) {
-    this.states = tuple.states;
-    this.alphabets = tuple.alphabets;
     this.delta = tuple.delta;
     this.startingState = tuple['start-state'];
     this.acceptableStates = tuple['final-states'];
