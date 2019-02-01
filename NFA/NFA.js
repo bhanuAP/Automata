@@ -6,16 +6,12 @@ class NFA {
     this.epsilonHandler = epsilonHandler;
   }
 
-  setUpMachine() {
-    this.currentStates = this.getEpsilonStates([this.startingState]);
-  }
-
-  updateCurrentStates(alphabet) {
-    this.currentStates = this.getCurrentStates(alphabet);
-  }
-
   getEpsilonStates(states) {
     return this.epsilonHandler.findEpsilonStates(states);
+  }
+
+  setUpMachine() {
+    this.currentStates = this.getEpsilonStates([this.startingState]);
   }
 
   getNextStates(state, alphabet) {
@@ -30,6 +26,10 @@ class NFA {
     return this.getEpsilonStates(states);
   }
 
+  updateCurrentStates(alphabet) {
+    this.currentStates = this.getCurrentStates(alphabet);
+  }
+
   doesAccept(alphabets) {
     let alphabetsArray = alphabets.split("");
     let acceptableStates = this.acceptableStates;
@@ -37,7 +37,6 @@ class NFA {
     alphabetsArray.map(alphabet=>this.updateCurrentStates(alphabet));
     return this.currentStates.some(state => acceptableStates.includes(state));
   }
-
 }
 
 module.exports = NFA;
