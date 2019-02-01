@@ -1,19 +1,19 @@
 class NFA {
-  constructor(tuple, epsilonFinder) {
+  constructor(tuple, epsilonHandler) {
     this.delta = tuple.delta;
     this.startingState = tuple['start-state'];
     this.acceptableStates = tuple['final-states'];
-    this.epsilonFinder = epsilonFinder;
+    this.epsilonHandler = epsilonHandler;
   }
 
-  doesAccept(alphabets) {
+  doesAccept(word) {
     let acceptableStates = this.acceptableStates;
     this.currentStates = [this.startingState];
-    this.currentStates = this.epsilonFinder.getEpsilonAppliedStates(this.currentStates);
-    alphabets.split("").forEach(alphabet => {
+    this.currentStates = this.epsilonHandler.findEpsilonStates(this.currentStates);
+    word.split("").forEach(alphabet => {
       this.currentStates = this.getNextStates(alphabet);
     });
-    this.currentStates = this.epsilonFinder.getEpsilonAppliedStates(this.currentStates);
+    this.currentStates = this.epsilonHandler.findEpsilonStates(this.currentStates);
     return this.currentStates.some(state => acceptableStates.includes(state));
   }
 
@@ -26,7 +26,7 @@ class NFA {
         newCurrentStates = newCurrentStates.concat(this.delta[state][alphabet]);
       }
     });
-    newCurrentStates = this.epsilonFinder.getEpsilonAppliedStates(newCurrentStates);
+    newCurrentStates = this.epsilonHandler.findEpsilonStates(newCurrentStates);
     return newCurrentStates;
   }
 }
